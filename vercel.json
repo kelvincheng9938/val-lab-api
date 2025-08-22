@@ -9,7 +9,4 @@
     { "src": "/v1/news", "dest": "/api/news.js" },
     { "src": "/health", "dest": "/api/health.js" }
   ],
-  "crons": [
-    { "path": "/api/cron/warm.js", "schedule": "0 * * * *" }
-  ]
 }
