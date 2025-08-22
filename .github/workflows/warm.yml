@@ -1,9 +1,8 @@
 name: Warm API hourly
-
 on:
   schedule:
-    - cron: '0 * * * *'   # 每小時 00 分，香港時間即係每小時 +8 可能有少少漂移（以 UTC 為準）
-  workflow_dispatch:      # 允許手動觸發
+    - cron: "0 * * * *"   # 每小時，改成 */15 * * * * = 每15分鐘
+  workflow_dispatch:       # 允許手動觸發
 
 jobs:
   ping:
@@ -11,4 +10,4 @@ jobs:
     steps:
       - name: Ping warm endpoint
         run: |
-          curl -fsS https://val-lab-api.vercel.app/api/warm || exit 1
+          curl -fsS https://val-lab-api.vercel.app/api/warm || true
