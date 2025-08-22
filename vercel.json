@@ -1,12 +1,9 @@
 {
   "version": 2,
-  "builds": [{ "src": "api/**/*.js", "use": "@vercel/node" }],
-  "routes": [
-    { "src": "/v1/valuation/(.*)", "dest": "/api/valuation.js" },
-    { "src": "/v1/peers/(.*)", "dest": "/api/peers.js" },
-    { "src": "/v1/segments/(.*)", "dest": "/api/segments.js" },
-    { "src": "/v1/market-snapshot", "dest": "/api/market.js" },
-    { "src": "/v1/news", "dest": "/api/news.js" },
-    { "src": "/health", "dest": "/api/health.js" }
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" }
+  ]
 }
