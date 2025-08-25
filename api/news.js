@@ -1,3 +1,8 @@
+res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+if (req.method === 'OPTIONS') return res.status(200).end();
+
 // /api/news.js
 import { ok, bad, fail, toISO } from "../lib/vendor.js";
 const FMP = process.env.FMP_API_KEY;
