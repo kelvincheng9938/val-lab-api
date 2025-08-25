@@ -1,33 +1,27 @@
-// api/news.js
+// /api/news.js
+import { ok, bad, fail, toISO } from "../lib/vendor.js";
+const FMP = process.env.FMP_API_KEY;
+const fmp = (p) => `https://financialmodelingprep.com/api${p}&apikey=${FMP}`;
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-
   try {
-    const token = process.env.FINNHUB_API_KEY;
-    const symbol = (req.query.symbol || 'SPY').toUpperCase();
+    const symbol = (req.query.symbol||"").toUpperCase().trim();
+    if (!symbol) return bad(res,"missing symbol");
 
-    // 取近7日公司新聞
-    const to = new Date();
-    const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const fmt = (d) => d.toISOString().slice(0, 10);
+    // FMP stock_news（近幾日）
+    const url = fmp(`/v3/stock_news?tickers=${symbol}&limit=20`);
+    const r = await fetch(url, { headers:{ "User-Agent":"val-lab/1.0" } });
+    if (!r.ok) throw new Error(`news ${r.status}`);
+    const arr = await r.json();
 
-    const url = `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${fmt(from)}&to=${fmt(to)}&token=${token}`;
-    const r = await fetch(url);
-    const data = await r.json();
+    const items = (arr||[]).map(x=>({
+      source: x?.site || x?.source || "news",
+      headline: x?.title || x?.headline,
+      summary: x?.text || x?.summary || "",
+      url: x?.url,
+      datetime: Number(x?.publishedDate ? Date.parse(x.publishedDate)/1000 : x?.timestamp || Date.now()/1000)
+    }));
 
-    const items = Array.isArray(data)
-      ? data.slice(0, 20).map(n => ({
-          source: n.source,
-          headline: n.headline,
-          summary: n.summary,
-          url: n.url,
-          datetime: n.datetime,
-        }))
-      : [];
-
-    res.status(200).json({ symbol, items });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: String(e) });
-  }
+    return ok(res, { symbol, items });
+  } catch(e){ return fail(res,e); }
 }
