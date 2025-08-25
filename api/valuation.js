@@ -3,11 +3,18 @@
 // 數源：FMP + Finnhub；全部有防呆，任何一步取不到都唔會 500
 
 export default async function handler(req, res) {
+  try {
   const url = new URL(req.url, 'http://localhost'); // vercel node runtime 需要 base
   const symbol = (url.searchParams.get('symbol') || 'CRM').toUpperCase();
   const mode = url.searchParams.get('mode') || ''; // "explain" 會回傳解釋
   const FMP = process.env.FMP_API_KEY;
   const FINN = process.env.FINNHUB_API_KEY;
+  } catch (e) {
+    res
+      .status(500)
+      .json({ ok: false, error: e?.message || String(e), hint: "valuation" });
+  }
+}
 
   if (!FMP) {
     return res.status(200).json({ ok: false, error: 'Missing FMP_API_KEY', symbol });
