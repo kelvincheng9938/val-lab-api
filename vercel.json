@@ -1,3 +1,41 @@
-{
-  "version": 2
-}
+// /lib/vendor.js
+const fetchJson = async (url, label = "req") => {
+  const r = await fetch(url, { headers: { "User-Agent": "val-lab/1.0" } });
+  if (!r.ok) throw new Error(`${label} ${r.status} ${url}`);
+  return r.json();
+};
+
+// simple in-memory cache (per lambda life)
+const _cache = new Map();
+export const cache = async (key, ttlMs, fn) => {
+  const now = Date.now();
+  const hit = _cache.get(key);
+  if (hit && now - hit.t < ttlMs) return hit.v;
+  const v = await fn();
+  _cache.set(key, { t: now, v });
+  return v;
+};
+
+export const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+
+// percentile with winsorize
+export const percentile = (arr, p) => {
+  const a = [...arr].filter(x => Number.isFinite(x)).sort((x, y) => x - y);
+  if (!a.length) return undefined;
+  const i = (a.length - 1) * p;
+  const lo = Math.floor(i), hi = Math.ceil(i);
+  if (lo === hi) return a[lo];
+  return a[lo] * (hi - i) + a[hi] * (i - lo);
+};
+
+export const winsorize = (arr, low = 0.05, high = 0.95) => {
+  const pL = percentile(arr, low);
+  const pH = percentile(arr, high);
+  return arr.map(x => clamp(x, pL, pH));
+};
+
+export const toISO = (d) => new Date(d).toISOString().slice(0,10);
+
+export const ok = (res, data) => res.status(200).json(data);
+export const bad = (res, msg) => res.status(400).json({ ok:false, error: msg });
+export const fail = (res, e) => res.status(500).json({ ok:false, error: e.message || String(e) });
