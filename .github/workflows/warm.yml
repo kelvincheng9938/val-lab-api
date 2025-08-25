@@ -1,10 +1,14 @@
-name: Keep Warm
+name: Warm API (daily or manual)
+
 on:
+  workflow_dispatch:        # 允許你手動按掣觸發
   schedule:
-    - cron: "0 */12 * * *"   # 每 12 小時 run 一次 (Hobby Plan 只支援 Daily)
+    - cron: '0 2 * * *'     # 每日 UTC 02:00（香港上午10點）跑一次
+
 jobs:
-  warm:
+  ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Curl warm endpoint
-        run: curl https://val-lab-api-one.vercel.app/api/warm
+      - name: Ping /api/warm
+        run: |
+          curl -s -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://val-lab-api-one.vercel.app/api/warm
