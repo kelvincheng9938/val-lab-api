@@ -1,8 +1,6 @@
 {
   "name": "val-lab-api",
   "private": true,
-  "type": "commonjs",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.45.1"
-  }
+  "type": "module",
+  "engines": { "node": "18.x" }
 }
