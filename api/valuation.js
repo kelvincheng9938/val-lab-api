@@ -1,3 +1,9 @@
+// --- CORS (讓前端可讀數) ---
+res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+res.setHeader('Access-Control-Allow-Headers', '*');
+if (req.method === 'OPTIONS') return res.status(200).end();
+// --- CORS end ---
 // api/valuation.js
 const FMP = process.env.FMP_API_KEY;
 
